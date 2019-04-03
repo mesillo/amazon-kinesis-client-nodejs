@@ -1,0 +1,11 @@
+ 1993  export JAVA_HOME=/home/mesillo/jdk-12/
+ 1995  export PATH=$PATH;$JAVA_HOME/bin/
+ 1996  export PATH=$PATH;$JAVA_HOMEbin/
+ 1997  export PATH=$PATH;$JAVA_HOMEbin
+ 2010  export JAVA_HOME=/home/mesillo/jdk-12/
+ 2016  export PATH=$PATH:/home/mesillo/jdk-12/bin/
+ 2064  export CLASSPATH=/home/mesillo/jdk-12/bin/:/mnt/c/Users/alberto.mesin/Documents/sources/amazon-kinesis-client-nodejs/lib/jars/
+ 2208  history | grep export
+ 2209  history | grep export > exports
+export PATH=$PATH:/home/mesillo/jdk-12/bin/
+export JAVA_HOME=/home/mesillo/jdk-12/

@@ -17,16 +17,12 @@ permissions and limitations under the License.
 
 var config = module.exports = {
   kinesis : {
-    region : 'eu-west-1',
-    endpoint: "http://localhost:4568",
-    accessKeyId:  "fakeAccessKeyId",
-    secretAccessKey: "fakeSecretAccessKey",
-    sessionToken: "fakeSessionToken"
+    region : 'us-east-1'
   },
 
   sampleProducer : {
-    stream : 'iot-raw-messages',
+    stream : 'kclnodejssample',
     shards : 2,
-    waitBetweenDescribeCallsInSeconds : 15
+    waitBetweenDescribeCallsInSeconds : 5
   }
 };

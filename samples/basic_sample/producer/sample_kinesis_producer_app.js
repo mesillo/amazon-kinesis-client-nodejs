@@ -19,5 +19,12 @@ var AWS = require('aws-sdk');
 var config = require('./config');
 var producer = require('./sample_producer');
 
-var kinesis = new AWS.Kinesis({region : config.kinesis.region});
+//var kinesis = new AWS.Kinesis({region : config.kinesis.region});
+//var kinesis = new AWS.Kinesis( {
+//    endpoint: "http://localhost:4567",
+//    region: config.kinesis.region,
+//} );
+
+let kinesis = new AWS.Kinesis( config.kinesis );
+
 producer(kinesis, config.sampleProducer).run();

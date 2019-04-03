@@ -1,0 +1,23 @@
+Resources:
+	https://cloudonaut.io/introducing-the-real-time-data-store-kinesis-streams/
+ 
+	git clone https://github.com/localstack/localstack.git
+	cd localstack
+	$env:SERVICES="kinesis"; docker-compose up -d
+	
+	aws configure  # con dati a caso... ma non vuoti
+	aws --endpoint-url=http://localhost:4568 kinesis create-stream --stream-name testStream --shard-count 2
+	aws --endpoint-url=http://localhost:4568 kinesis delete-stream --stream-name testStream
+	aws --endpoint-url=http://localhost:4568 kinesis list-streams
+	
+	https://github.com/mhart/kinesalite#cbor-protocol-issues-with-the-java-sdk
+	//var kinesis = new AWS.Kinesis({region : config.kinesis.region});
+	var kinesis = new AWS.Kinesis({endpoint: 'http://localhost:4568'});
+ 
+
+docker run -d -p15672:15672 -p5672:5672 --name rabbitmq -v rabbit_volume:/bitnami bitnami/rabbitmq:latest
+config
+	vhost		/
+	username	user
+	passwd		bitnami
+	host		127.0.0.1 (winzozz ha problemi con localhost, lo risolve ipv6)

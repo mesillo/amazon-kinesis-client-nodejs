@@ -4,7 +4,7 @@
 executableName = node sample_kcl_app.js
 
 # The name of an Amazon Kinesis stream to process.
-streamName = iot-raw-messages
+streamName = kclnodejssample
 
 # Used by the KCL as the name of this application. Will be used as the name
 # of an Amazon DynamoDB table which will store the lease and checkpoint
@@ -29,11 +29,7 @@ initialPositionInStream = TRIM_HORIZON
 # by the MultiLangDaemon.
 
 # Region of the stream for the KCL.
-regionName = eu-west-1
-
-kinesisEndpoint = http://localhost:4568
-#endpoint = http://localhost:4568
-dynamodbEndpoint = http://localhost:4569
+regionName = us-east-1
 
 # Fail over time in milliseconds. A worker which does not renew it's lease within this time interval
 # will be regarded as having problems and it's shards will be assigned to other workers.
