@@ -1,3 +1,6 @@
+/**
+ * Based on https://cloudonaut.io/introducing-the-real-time-data-store-kinesis-streams/
+ */
 "use strict"
 
 var AWS = require('aws-sdk');
