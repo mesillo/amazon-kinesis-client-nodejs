@@ -11,13 +11,13 @@ class Kinesis {
 		this._init( config );
 	}
 
-	async _init( config = null ) {
+	_init( config = null ) {
 		if( ! config ) {
             this.config = defaultConfig;
         }
 		this.kinesis = new AWS.Kinesis( this.config.kinesis ); //TODO: a try catch?!?!?
 		this._streams = {};
-		await this._initStreams(); // save the promise somewhere?
+		this._streamP = this._initStreams();
 	}
 
 	_initStream( params = null ) {
