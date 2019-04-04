@@ -7,7 +7,8 @@ let Kinesis = require( "./lib/kinesis" );
 
 let kns = new Kinesis();
 
-//setTimeout( () => {
+console.log( kns.getStreams() );
+setTimeout( () => {
     console.log( kns.getStreams() );
-//}, 10000 );
+}, 10000 );
 
