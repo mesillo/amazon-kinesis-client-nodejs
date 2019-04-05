@@ -2,7 +2,7 @@
  * @author Alberto Mesin
  */
 "use strict"
-
+//TODO: recovering... pain in the arse...
 let AWS = require( "aws-sdk" );
 let defaultConfig = require( "../conf/config" );
 
@@ -11,7 +11,7 @@ class Kinesis {
 		this._init( config );
 	}
 
-	_init( config = null ) {
+	_init( config = null ) { //TODO: refactoring in more Promise-Style???
 		if( ! config ) {
             this.config = defaultConfig;
         }
@@ -80,6 +80,46 @@ class Kinesis {
 
 	getStreams() {
 		return this._streams;
+	}
+
+	getStream( StreamName ) {
+		return this._streams[ StreamName ];
+	}
+
+	onStreamready( StreamName ) {
+		let streamInfo = this.getStream( StreamName );
+		if( typeof streamInfo === "object" ) { // TODO: Is enough? Need to search in config?
+			return streamInfo.Active;
+		} else {
+			return Promise.reject( "Not initialized yet." );
+		}
+	}
+
+	onReady() {
+		return this._streamP;
+	}
+
+	writeToStream( StreamName, PartitionKey, Data ) {
+		return new Promise( ( resolve, reject ) => {
+			this.onReady().then( () => {
+				this.onStreamready( StreamName ).then( () => {
+					let recordParams = {
+						Data: typeof Data === "string" ? Data : JSON.stringify( Data ),
+    					PartitionKey: typeof PartitionKey === "string" ? PartitionKey : PartitionKey.toString(),
+    					StreamName: StreamName
+					};
+
+					this.kinesis.putRecord( recordParams, ( error, data ) => { //TODO: use putRecors... more redords more efficiency
+						if( error )
+						{
+							reject( error );
+						} else {
+							resolve( data );
+						}
+					} );
+				} );
+			} );
+		} );
 	}
 }
 
