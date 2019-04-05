@@ -15,7 +15,7 @@ var config = {
 	},
 
 	sampleConsume : {
-		stream : 'iot-raw-messages'
+		stream : 'test-stream'
 	}
 };
 
