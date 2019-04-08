@@ -15,12 +15,12 @@ let config = {
 
 	streams: [ {
 		StreamName: "test-stream",
-		ShardCount: 3,
-		ShardIteratorType: "TRIM_HORIZON"
+		ShardCount: 3
 	} ],
 
 	application: {
-		waitBetweenDescribeCalls: 5 // in seconds.
+		waitBetweenDescribeCalls: 5, // in seconds.
+		ShardIteratorType: "TRIM_HORIZON" // TODO: move; one per streams!
 	}
 };
 

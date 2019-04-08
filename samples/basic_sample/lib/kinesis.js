@@ -110,8 +110,7 @@ class Kinesis {
 					};
 
 					this.kinesis.putRecord( recordParams, ( error, data ) => { //TODO: use putRecors... more redords more efficiency
-						if( error )
-						{
+						if( error ) {
 							reject( error );
 						} else {
 							resolve( data );
@@ -132,7 +131,7 @@ class Kinesis {
 						let promise = new Promise( ( resolve, reject ) => {
 							let iteratorParameters = {
 								ShardId: shard.ShardId,
-								ShardIteratorType: this.config.streams.ShardIteratorType,
+								ShardIteratorType: this.config.application.ShardIteratorType,
 								StreamName: StreamName
 							};
 							this.kinesis.getShardIterator( iteratorParameters, ( error, shardIteratordata ) => {
@@ -158,14 +157,15 @@ class Kinesis {
 	}
 
 	readFromStream( StreamName ) {
-		return new Promise( ( resolve, reject ) => {
-			this.onReady().then( () => {
-				this.onStreamready( StreamName ).then( ( StreamDescription ) => {
-					let shards = StreamDescription.StreamDescription.Shards;
-					console.dir( shards );
+		//return new Promise( ( resolve, reject ) => {
+			this.getStreamsIterators( StreamName )
+				.then( ( iterators ) => {
+					
+					for( let iterator of iterators ) {
+						this.kinesis.getRecords();
+					}
 				} );
-			} );
-		} );
+		//} );
 	}
 }
 
