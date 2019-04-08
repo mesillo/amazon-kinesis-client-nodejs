@@ -15,11 +15,8 @@ let config = {
 
 	streams: [ {
 		StreamName: "test-stream",
-		ShardCount: 2
-	},
-	{
-		StreamName: "second-stupid-stream",
-		ShardCount: 5
+		ShardCount: 3,
+		ShardIteratorType: "TRIM_HORIZON"
 	} ],
 
 	application: {

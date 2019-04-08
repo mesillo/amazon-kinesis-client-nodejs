@@ -121,6 +121,52 @@ class Kinesis {
 			} );
 		} );
 	}
+
+	getStreamsIterators( StreamName ) {
+		return new Promise( ( resolve, reject ) => {
+			this.onReady().then( () => {
+				this.onStreamready( StreamName ).then( ( StreamDescription ) => {
+					let shards = StreamDescription.StreamDescription.Shards;
+					let iterators = [];
+					for( let shard of shards ) {
+						let promise = new Promise( ( resolve, reject ) => {
+							let iteratorParameters = {
+								ShardId: shard.ShardId,
+								ShardIteratorType: this.config.streams.ShardIteratorType,
+								StreamName: StreamName
+							};
+							this.kinesis.getShardIterator( iteratorParameters, ( error, shardIteratordata ) => {
+								if( error ) {
+									reject( error );
+								} else {
+									resolve( shardIteratordata );
+								}
+							} );
+						} );
+						iterators.push( promise );
+					}
+
+					return Promise.all( iterators )
+						.then( ( data ) => {
+							resolve( data );
+						} ).catch( ( error ) => {
+							reject( error );
+						} );
+				} );
+			} );
+		} );
+	}
+
+	readFromStream( StreamName ) {
+		return new Promise( ( resolve, reject ) => {
+			this.onReady().then( () => {
+				this.onStreamready( StreamName ).then( ( StreamDescription ) => {
+					let shards = StreamDescription.StreamDescription.Shards;
+					console.dir( shards );
+				} );
+			} );
+		} );
+	}
 }
 
 module.exports = Kinesis;
