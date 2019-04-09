@@ -160,12 +160,31 @@ class Kinesis {
 		//return new Promise( ( resolve, reject ) => {
 			this.getStreamsIterators( StreamName )
 				.then( ( iterators ) => {
-					
+					let readerId = 0;
 					for( let iterator of iterators ) {
-						this.kinesis.getRecords();
+						this._readFromIterator( readerId, iterator.ShardIterator );
 					}
 				} );
 		//} );
+	}
+
+	_readFromIterator( shardId, iterator ) {
+		let recordParams = {
+			ShardIterator: iterator
+		};
+
+		this.kinesis.getRecords( recordParams, ( error, recordsData ) => {
+			if( error ) {
+				console.dir( error );
+			} else {
+				//console.dir( recordsData.Records.length );
+				let nextShardIterator = recordsData.NextShardIterator;
+				if( nextShardIterator ) {
+					//console.log( nextShardIterator );
+					//this._readFromIterator( nextShardIterator );
+				}
+			}
+		} );
 	}
 }
 
