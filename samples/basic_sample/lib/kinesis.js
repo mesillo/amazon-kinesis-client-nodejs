@@ -156,32 +156,34 @@ class Kinesis {
 		} );
 	}
 
-	readFromStream( StreamName ) {
+	readFromStream( StreamName, dataProcessor = ( data, rId ) => {} ) {
 		//return new Promise( ( resolve, reject ) => {
 			this.getStreamsIterators( StreamName )
 				.then( ( iterators ) => {
 					let readerId = 0;
 					for( let iterator of iterators ) {
-						this._readFromIterator( readerId, iterator.ShardIterator );
+						this._readFromIterator( readerId++, iterator.ShardIterator, dataProcessor );
 					}
 				} );
 		//} );
 	}
 
-	_readFromIterator( shardId, iterator ) {
+	_readFromIterator( shardId, iterator, dataProcessor ) {
 		let recordParams = {
 			ShardIterator: iterator
 		};
 
 		this.kinesis.getRecords( recordParams, ( error, recordsData ) => {
 			if( error ) {
-				console.dir( error );
+				throw new Error( error.message ); // TODO: Improve This code!!!
 			} else {
-				//console.dir( recordsData.Records.length );
+				if( recordsData.Records.length ) {
+					dataProcessor( recordsData.Records, shardId );
+				}
+				//// call another istance ////
 				let nextShardIterator = recordsData.NextShardIterator;
 				if( nextShardIterator ) {
-					//console.log( nextShardIterator );
-					//this._readFromIterator( nextShardIterator );
+					this._readFromIterator( shardId, nextShardIterator, dataProcessor );
 				}
 			}
 		} );
