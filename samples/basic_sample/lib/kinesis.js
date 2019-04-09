@@ -17,6 +17,7 @@ class Kinesis {
         }
 		this.kinesis = new AWS.Kinesis( this.config.kinesis ); //TODO: a try catch?!?!?
 		this._streams = {};
+		this._initReaderStatus();
 		this._streamP = this._initStreams();
 	}
 
@@ -54,6 +55,10 @@ class Kinesis {
 		}
 
 		return Promise.all( promises );
+	}
+
+	_initReaderStatus() {
+		// TODO: do somethings...
 	}
 
 	_whenActive( StreamName ) {

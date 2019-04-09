@@ -3,6 +3,8 @@
  */
 "use strict"
 
+let persistance = null;
+
 let config = {
 	kinesis: {
 		//region: "eu-west-1",
@@ -20,7 +22,9 @@ let config = {
 
 	application: {
 		waitBetweenDescribeCalls: 5, // in seconds.
-		ShardIteratorType: "TRIM_HORIZON" // TODO: move; one per streams!
+		ShardIteratorType: "TRIM_HORIZON", // TODO: move; one per streams!
+		persistence: persistance,
+		persistanceTimeout: 5 // in seconds
 	}
 };
 
