@@ -13,7 +13,7 @@ class Persistance {
 		if( fs.existsSync( DB ) ) {
 			data = JSON.parse( fs.readFileSync( DB, "utf8" ) );
 		}
-		console.info( "PERS - readed: " + JSON.stringify( data ) );
+		console.info( "PERS - Readed: " + JSON.stringify( data ) );
 		return data;
 	}
 
