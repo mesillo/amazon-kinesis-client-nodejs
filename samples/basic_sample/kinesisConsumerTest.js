@@ -13,6 +13,7 @@ kns.onReady().then( () => {
         for( let record of records ) {
             let data = record.Data.toString();
             console.log( `\t\t${data}` );
+            //console.dir( record );
         }
     } );
 } );

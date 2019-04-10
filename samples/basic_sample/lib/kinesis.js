@@ -199,25 +199,25 @@ class Kinesis {
 
 	readFromStream( StreamName, dataProcessor = ( data, rId ) => {} ) {
 		let streamStatus = this._setStreamStatus( StreamName, this._getStreamStatus( StreamName ) );
-		let streamStatusKeys = Object.keys( streamStatus );
-		if( streamStatusKeys.length ) {
-			this.onReady().then( () => {
-				this.onStreamready( StreamName ).then( () => {
-					let iterators = [];
-					for( let key of streamStatusKeys ) {
-						iterators.push( {
-							ShardIterator: streamStatus[ key ]
-						} );
-						this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
-					}
-				} );
-			} );
-		} else {
+		//let streamStatusKeys = Object.keys( streamStatus );
+		//if( streamStatusKeys.length ) {
+		//	this.onReady().then( () => {
+		//		this.onStreamready( StreamName ).then( () => {
+		//			let iterators = [];
+		//			for( let key of streamStatusKeys ) {
+		//				iterators.push( {
+		//					ShardIterator: streamStatus[ key ]
+		//				} );
+		//				this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
+		//			}
+		//		} );
+		//	} );
+		//} else {
 			this.getStreamsIterators( StreamName )
 				.then( ( iterators ) => {
 					this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
 				} );
-		}
+		//}
 	}
 
 	_startIteratorsReaders( iterators, status, dataProcessor ) {
@@ -239,12 +239,18 @@ class Kinesis {
 				if( recordsData.Records.length ) {
 					dataProcessor( recordsData.Records, shardId );
 				}
+				//// persistence ////
+				let lastRecord = recordsData.Records[ recordsData.Records.length - 1 ];
+				let persistenceRecord = {
+					SequenceNumber: lastRecord.SequenceNumber,
+					ApproximateArrivalTimestamp: lastRecord.ApproximateArrivalTimestamp
+				}
+				status[ shardId ] = persistenceRecord;
 				//// call another istance ////
 				let nextShardIterator = recordsData.NextShardIterator;
 				if( nextShardIterator ) {
-					this._readFromIterator( shardId, nextShardIterator, dataProcessor );
+					this._readFromIterator( shardId, nextShardIterator, status, dataProcessor );
 				} // TODO: else.
-				console.dir( status );
 				//status[ shardId ] = nextShardIterator;
 			}
 		} );

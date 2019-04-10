@@ -4,6 +4,7 @@
 "use strict"
 
 const DB = "./db.json";
+const loginfo = true;
 
 let fs = require( "fs" );
 
@@ -13,14 +14,14 @@ class Persistance {
 		if( fs.existsSync( DB ) ) {
 			data = JSON.parse( fs.readFileSync( DB, "utf8" ) );
 		}
-		console.info( "PERS - Readed: " + JSON.stringify( data ) );
+		if( loginfo ) console.info( "PERS - Readed: " + JSON.stringify( data ) );
 		return data;
 	}
 
 	static setData( data ) {
 		let JSONdata = JSON.stringify( data );
 		fs.writeFileSync( DB, JSONdata, "utf8" );
-		console.info( "PERS - Saved: " + JSONdata );
+		if( loginfo ) console.info( "PERS - Saved: " + JSONdata );
 	}
 }
 
