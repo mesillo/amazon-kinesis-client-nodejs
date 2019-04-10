@@ -3,7 +3,7 @@
  */
 "use strict"
 
-let persistance = null;
+let persistence = require( "../lib/persistence" );
 
 let config = {
 	kinesis: {
@@ -23,8 +23,8 @@ let config = {
 	application: {
 		waitBetweenDescribeCalls: 5, // in seconds.
 		ShardIteratorType: "TRIM_HORIZON", // TODO: move; one per streams!
-		persistence: persistance,
-		persistanceTimeout: 5 // in seconds
+		persistence: persistence,
+		persistanceTimeout: 1 // in seconds
 	}
 };
 
