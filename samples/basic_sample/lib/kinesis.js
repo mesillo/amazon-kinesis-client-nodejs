@@ -240,12 +240,16 @@ class Kinesis {
 					dataProcessor( recordsData.Records, shardId );
 				}
 				//// persistence ////
-				let lastRecord = recordsData.Records[ recordsData.Records.length - 1 ];
-				let persistenceRecord = {
-					SequenceNumber: lastRecord.SequenceNumber,
-					ApproximateArrivalTimestamp: lastRecord.ApproximateArrivalTimestamp
+				//console.log( recordsData.Records );
+				//console.log( recordsData.Records.length );
+				if( recordsData.Records.length ) {
+					let lastRecord = recordsData.Records[ recordsData.Records.length - 1 ];
+					let persistenceRecord = {
+						SequenceNumber: lastRecord.SequenceNumber,
+						ApproximateArrivalTimestamp: lastRecord.ApproximateArrivalTimestamp
+					}
+					status[ shardId ] = persistenceRecord;
 				}
-				status[ shardId ] = persistenceRecord;
 				//// call another istance ////
 				let nextShardIterator = recordsData.NextShardIterator;
 				if( nextShardIterator ) {
