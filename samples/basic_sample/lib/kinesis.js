@@ -168,13 +168,10 @@ class Kinesis {
 				this.onStreamready( StreamName ).then( ( StreamDescription ) => {
 					let shards = StreamDescription.StreamDescription.Shards;
 					let iterators = [];
+					let iteratorParameters = this._getStreamParams( StreamName );
 					for( let shard of shards ) {
 						let promise = new Promise( ( resolve, reject ) => {
-							let iteratorParameters = {
-								ShardId: shard.ShardId,
-								ShardIteratorType: this.config.application.ShardIteratorType,
-								StreamName: StreamName
-							};
+							iteratorParameters.ShardId = shard.ShardId;
 							this.kinesis.getShardIterator( iteratorParameters, ( error, shardIteratordata ) => {
 								if( error ) {
 									reject( error );
@@ -197,27 +194,35 @@ class Kinesis {
 		} );
 	}
 
+	_getStreamParams( StreamName ) {
+		let iteratorParameters = {
+			ShardId: null,
+			ShardIteratorType: this.config.application.ShardIteratorType,
+			StreamName: StreamName
+		};
+		//// use te persitence Luke! ////
+		let streamStatus = this._setStreamStatus( StreamName, this._getStreamStatus( StreamName ) );
+		if( Object.keys( streamStatus ).length ) { // have some confs
+			iteratorParameters.ShardIteratorType = "AFTER_SEQUENCE_NUMBER";
+			let lastTimestamp = new Date( "1970-01-01T00:00:00.000Z" ); // the Epoch!
+			for( let shardStatus of streamStatus ) {
+				let shardDate = new Date( shardStatus.ApproximateArrivalTimestamp );
+				if( shardDate > lastTimestamp ) {
+					lastTimestamp = shardDate;
+					iteratorParameters[ "StartingSequenceNumber" ] = shardStatus.SequenceNumber;
+				}
+			}
+		}
+		/////////////////////////////////
+		return iteratorParameters;
+	}
+
 	readFromStream( StreamName, dataProcessor = ( data, rId ) => {} ) {
 		let streamStatus = this._setStreamStatus( StreamName, this._getStreamStatus( StreamName ) );
-		//let streamStatusKeys = Object.keys( streamStatus );
-		//if( streamStatusKeys.length ) {
-		//	this.onReady().then( () => {
-		//		this.onStreamready( StreamName ).then( () => {
-		//			let iterators = [];
-		//			for( let key of streamStatusKeys ) {
-		//				iterators.push( {
-		//					ShardIterator: streamStatus[ key ]
-		//				} );
-		//				this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
-		//			}
-		//		} );
-		//	} );
-		//} else {
-			this.getStreamsIterators( StreamName )
-				.then( ( iterators ) => {
-					this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
-				} );
-		//}
+		this.getStreamsIterators( StreamName )
+			.then( ( iterators ) => {
+				this._startIteratorsReaders( iterators, streamStatus, dataProcessor );
+			} );
 	}
 
 	_startIteratorsReaders( iterators, status, dataProcessor ) {
@@ -240,8 +245,6 @@ class Kinesis {
 					dataProcessor( recordsData.Records, shardId );
 				}
 				//// persistence ////
-				//console.log( recordsData.Records );
-				//console.log( recordsData.Records.length );
 				if( recordsData.Records.length ) {
 					let lastRecord = recordsData.Records[ recordsData.Records.length - 1 ];
 					let persistenceRecord = {
@@ -255,7 +258,6 @@ class Kinesis {
 				if( nextShardIterator ) {
 					this._readFromIterator( shardId, nextShardIterator, status, dataProcessor );
 				} // TODO: else.
-				//status[ shardId ] = nextShardIterator;
 			}
 		} );
 	}

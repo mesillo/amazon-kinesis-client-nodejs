@@ -4,7 +4,7 @@
 "use strict"
 
 const DB = "./db.json";
-const loginfo = true;
+const loginfo = false;
 
 let fs = require( "fs" );
 
