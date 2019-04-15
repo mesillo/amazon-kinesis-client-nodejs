@@ -166,6 +166,7 @@ class Kinesis {
 		return new Promise( ( resolve, reject ) => {
 			this.onReady().then( () => {
 				this.onStreamready( StreamName ).then( ( StreamDescription ) => {
+					console.log( StreamDescription.StreamDescription.Shards );
 					let shards = StreamDescription.StreamDescription.Shards;
 					let iterators = [];
 					let iteratorParameters = this._getStreamParams( StreamName );
@@ -176,7 +177,10 @@ class Kinesis {
 								if( error ) {
 									reject( error );
 								} else {
-									resolve( shardIteratordata );
+									resolve( {
+											shardIteratordata: shardIteratordata,
+											shardId: shard.ShardId
+									} );
 								}
 							} );
 						} );
@@ -202,17 +206,19 @@ class Kinesis {
 		};
 		//// use te persitence Luke! ////
 		let streamStatus = this._setStreamStatus( StreamName, this._getStreamStatus( StreamName ) );
-		if( Object.keys( streamStatus ).length ) { // have some confs
-			iteratorParameters.ShardIteratorType = "AFTER_SEQUENCE_NUMBER";
-			let lastTimestamp = new Date( "1970-01-01T00:00:00.000Z" ); // the Epoch!
-			for( let shardStatus of streamStatus ) {
-				let shardDate = new Date( shardStatus.ApproximateArrivalTimestamp );
-				if( shardDate > lastTimestamp ) {
-					lastTimestamp = shardDate;
-					iteratorParameters[ "StartingSequenceNumber" ] = shardStatus.SequenceNumber;
-				}
-			}
-		}
+		let streamStatusKeys = Object.keys( streamStatus );
+		//if( streamStatusKeys.length ) { // have some confs
+		//	iteratorParameters.ShardIteratorType = "AFTER_SEQUENCE_NUMBER";
+		//	let lastTimestamp = new Date( "1970-01-01T00:00:00.000Z" ); // the Epoch!
+		//	for( let shardStatuskey of streamStatusKeys ) {
+		//		let shardStatus = streamStatus[ shardStatuskey ];
+		//		let shardDate = new Date( shardStatus.ApproximateArrivalTimestamp );
+		//		if( shardDate > lastTimestamp ) {
+		//			lastTimestamp = shardDate;
+		//			iteratorParameters[ "StartingSequenceNumber" ] = shardStatus.SequenceNumber;
+		//		}
+		//	}
+		//}
 		/////////////////////////////////
 		return iteratorParameters;
 	}
