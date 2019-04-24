@@ -21,3 +21,10 @@ config
 	username	user
 	passwd		bitnami
 	host		127.0.0.1 (winzozz ha problemi con localhost, lo risolve ipv6)
+
+Lambda con node su localstack: https://github.com/localstack/localstack.git
+	$env:SERVICES="kinesis,lambda";$env:LAMBDA_EXECUTOR="docker"; docker-compose up
+	aws --region=us-east-1 --endpoint-url=http://localhost:4574 lambda create-function --function-name=testFn --runtime=nodejs8.10 --role=r1 --handler=main.handler --zip-file fileb://lambda.zip
+	aws lambda --endpoint-url=http://localhost:4574 invoke --region=local --function-name testFn --payload '{"key1":"value1", "key2":"value2:"value3"}' result.log
+
+lambda code example: https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-userapp.html
