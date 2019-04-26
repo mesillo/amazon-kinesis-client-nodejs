@@ -28,3 +28,26 @@ Lambda con node su localstack: https://github.com/localstack/localstack.git
 	aws lambda --endpoint-url=http://localhost:4574 invoke --region=local --function-name testFn --payload '{"key1":"value1", "key2":"value2:"value3"}' result.log
 
 lambda code example: https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-userapp.html
+
+==============================================================================================================================================
+
+	git clone https://github.com/localstack/localstack.git
+	cd localstack
+	$env:SERVICES="kinesis,lambda"; docker-compose up -d
+	$env:SERVICES="kinesis,lambda,cloudwatch"; docker-compose up
+	
+	$env:SERVICES="kinesis,lambda,cloudwatch";$env:LAMBDA_EXECUTOR="docker"; docker-compose up
+	zip -r application.zip *
+	aws --region=us-east-1 --endpoint-url=http://localhost:4574 lambda create-function --function-name=testFn --runtime=nodejs8.10 --role=r1 --handler=main.handler --zip-file fileb://lambda.zip
+	aws --region=local --endpoint-url=http://localhost:4574 lambda create-function --function-name=testFn --runtime=nodejs8.10 --role=fakeRole --handler=dist/main.handler --zip-file fileb://application.zip
+	aws lambda --endpoint-url=http://localhost:4574 invoke --region=local --function-name testFn --payload='{"key1":"value1", "key2":"value2"}' result.log
+	
+	
+	aws configure  # con dati a caso... ma non vuoti
+	aws --endpoint-url=http://localhost:4568 kinesis create-stream --stream-name testStream --shard-count 2
+	aws --endpoint-url=http://localhost:4568 kinesis delete-stream --stream-name testStream
+	aws --endpoint-url=http://localhost:4568 kinesis list-streams
+	
+	https://github.com/mhart/kinesalite#cbor-protocol-issues-with-the-java-sdk
+	//var kinesis = new AWS.Kinesis({region : config.kinesis.region});
+	var kinesis = new AWS.Kinesis({endpoint: 'http://localhost:4567'});
