@@ -41,7 +41,18 @@ lambda code example: https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-use
 	aws --region=us-east-1 --endpoint-url=http://localhost:4574 lambda create-function --function-name=testFn --runtime=nodejs8.10 --role=r1 --handler=main.handler --zip-file fileb://lambda.zip
 	aws --region=local --endpoint-url=http://localhost:4574 lambda create-function --function-name=testFn --runtime=nodejs8.10 --role=fakeRole --handler=dist/main.handler --zip-file fileb://application.zip
 	aws lambda --endpoint-url=http://localhost:4574 invoke --region=local --function-name testFn --payload='{"key1":"value1", "key2":"value2"}' result.log
-	
+	aws --region=local --endpoint-url=http://localhost:4574 lambda update-function-code --function-name=testFn --zip-file fileb://application.zip
+
+	aws logs describe-log-groups --endpoint-url=http://localhost:4586 --region=us-east-1
+	aws logs describe-log-streams --log-group-name /aws/lambda/testFn --endpoint-url=http://localhost:4586 --region=us-east-1
+	aws logs get-log-events --output text --log-group-name /aws/lambda/testFn --log-stream-name ????? --endpoint-url=http://localhost:4586 --region=us-east-1
+
+	aws kinesis describe-stream --stream-name test-stream --endpoint-url=http://localhost:4568 --region=local
+
+	aws lambda create-event-source-mapping --function-name testFn --event-source arn:aws:kinesis:us-east-1:000000000000:stream/test-stream --batch-size 10 --starting-position TRIM_HORIZON --region=local --endpoint-url=http://localhost:4574
+
+	https://github.com/localstack/awscli-local
+	https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-kinesis-example.html
 	
 	aws configure  # con dati a caso... ma non vuoti
 	aws --endpoint-url=http://localhost:4568 kinesis create-stream --stream-name testStream --shard-count 2
@@ -51,3 +62,28 @@ lambda code example: https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-use
 	https://github.com/mhart/kinesalite#cbor-protocol-issues-with-the-java-sdk
 	//var kinesis = new AWS.Kinesis({region : config.kinesis.region});
 	var kinesis = new AWS.Kinesis({endpoint: 'http://localhost:4567'});
+
+===================================================================================================================================================================
+
+console.log('Loading function');
+
+exports.handler = function(event, context) {
+    //console.log(JSON.stringify(event, null, 2));
+    event.Records.forEach(function(record) {
+        // Kinesis data is base64 encoded so decode here
+        var payload = new Buffer(record.kinesis.data, 'base64').toString('ascii');
+        console.log('Decoded payload:', payload);
+    });
+};
+
+{ Records: 
+   [ { eventID: 'shardId-000000000000:49595160041073623401520312716573683571199835999744032770',
+       eventSourceARN: 'arn:aws:kinesis:us-east-1:000000000000:stream/test-stream',
+       kinesis: 
+        { partitionKey: '48748',
+          data: 'eyJ2YWx1ZSI6IjE4ID0+IFJhbmQ6IDYifQ==',
+          sequenceNumber: '49595160041073623401520312716573683571199835999744032770' } } ] }
+
+{"Records":[{"eventID":"shardId-000000000000:49595160041073623401520312716573683571199835999744032770","eventSourceARN":"arn:aws:kinesis:us-east-1:000000000000:stream/test-stream","kinesis":{"partitionKey":"48748","data":"eyJ2YWx1ZSI6IjE4ID0+IFJhbmQ6IDYifQ==","sequenceNumber":"49595160041073623401520312716573683571199835999744032770"}}]}
+
+{"Records":[{"eventID":"shardId-000000000000:49595158952797257713225903409617333681943815677517234178","eventSourceARN":"arn:aws:kinesis:us-east-1:000000000000:stream/test-stream","kinesis":{"partitionKey":"95907","data":"eyJ2YWx1ZSI6IjggPT4gUmFuZDogNiJ9","sequenceNumber":"49595158952797257713225903409617333681943815677517234178"}}]}

@@ -1,1 +1,5 @@
 https://scotch.io/@nwayve/how-to-build-a-lambda-function-in-typescript
+
+https://github.com/localstack/awscli-local
+
+https://docs.aws.amazon.com/it_it/lambda/latest/dg/with-kinesis-example.html
